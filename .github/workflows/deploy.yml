@@ -1,0 +1,43 @@
+[cite_start]name: Deploy # Nombre del flujo de trabajo [cite: 117, 192]
+
+[cite_start]on: push # Ejecutar el flujo cuando haya un push al repositorio [cite: 120, 193]
+
+jobs: # Lista de trabajos que se ejecutarán. Cada uno puede tener sus propios pasos. [cite: 121, 194]
+  [cite_start]build: # Primer trabajo: construcción [cite: 160]
+    [cite_start]runs-on: ubuntu-latest # El entorno donde correrá (una VM de Ubuntu) [cite: 161, 195]
+    [cite_start]steps: # Lista de pasos que se ejecutarán en orden. [cite: 161, 196]
+      - [cite_start]name: Checkout code # Paso 1: Obtener el código del repositorio [cite: 162]
+        [cite_start]uses: actions/checkout@v4 [cite: 162, 197]
+
+      - [cite_start]name: Install node # Paso 2: Instalar Node.js [cite: 163]
+        [cite_start]uses: actions/setup-node@v4 [cite: 164, 197]
+        with:
+          [cite_start]node-version: '18' # Especificar la versión de Node [cite: 166]
+
+      - [cite_start]name: Install dependencies # Paso 3: Instalar dependencias del proyecto [cite: 167]
+        [cite_start]run: npm install [cite: 167, 198]
+
+      - [cite_start]name: Run tests # Paso 4: Ejecutar pruebas automáticas [cite: 168]
+        [cite_start]run: npm run test [cite: 168, 198]
+
+      - [cite_start]name: Build project # Paso 5: Construir el proyecto [cite: 169]
+        [cite_start]run: npm run build [cite: 169, 198]
+
+      - [cite_start]name: Upload artifact # Paso 6: Subir los archivos a desplegar [cite: 170]
+        [cite_start]uses: actions/upload-pages-artifact@v3 [cite: 171, 197]
+        with:
+          [cite_start]path: public/ # Carpeta que contiene los archivos estáticos [cite: 173]
+
+  [cite_start]deploy: # Segundo trabajo: despliegue [cite: 174]
+    [cite_start]runs-on: ubuntu-latest [cite: 175, 195]
+    [cite_start]needs: build # Este job depende de que 'build' se complete [cite: 176, 199]
+    [cite_start]permissions: # Establece permisos requeridos por el job para operar. [cite: 177, 200]
+      [cite_start]pages: write # Permiso para escribir en GitHub Pages [cite: 178]
+      [cite_start]id-token: write # Permiso para autenticación segura [cite: 178]
+    [cite_start]environment: # Define el entorno de despliegue, puede incluir variables y configuraciones específicas. [cite: 178, 201]
+      [cite_start]name: github-pages # Nombre del entorno [cite: 179]
+      [cite_start]url: ${{ steps.deploy-pages.outputs.page_url }} # URL de la página publicada [cite: 180]
+    [cite_start]steps: # Lista de pasos que se ejecutarán en orden. [cite: 181, 196]
+      - [cite_start]name: Deploy to pages # Paso único: desplegar en GitHub Pages [cite: 182]
+        id: deploy-pages
+        [cite_start]uses: actions/deploy-pages@v4 [cite: 184, 197]
